@@ -6,123 +6,200 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+        #map {
+            height: 100%;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 </head>
 
 <body>
-    <svg id="graph">
-    </svg>
+    <div id="map"></div>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA-mZdQ8OpIDPe_Up678940OIcSBjv4aLQ&callback=initMap"
+    type="text/javascript"></script>
+    </script>
     <script>
-         class Circle {
-            constructor(pos) {
-                this.el = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                this.el.classList.add("circle");
-                this.el.setAttribute("r", "20");
-                this.el.setAttribute("stroke", "black");
-                this.el.setAttribute("stroke-width", "4");
-                this.setPosition(pos);
-            }
+        var dir;
+        var map;
+        var poly;
+        var tmpPoly;
+        var direction = [];
 
-            setPosition(pos) {
-                this.el.setAttribute("cx", pos.cx);
-                this.el.setAttribute("cy", pos.cy);
-            }
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 7,
+                center: {
+                    lat: -15.77972,
+                    lng: -47.92972
+                }
+            });
 
-            getPosition() {
-                return {
-                    cx: this.el.getAttribute("cx"),
-                    cy: this.el.getAttribute("cy")
-                };
-            }
+            poly = new google.maps.Polyline({
+                strokeColor: '#000000',
+                strokeOpacity: 1.0,
+                strokeWeight: 3,
+                clickable: false,
+            });
 
-            getHtmlEl() {
-                return this.el;
+            tmpPoly = new google.maps.Polyline({
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 3,
+                map: map,
+                clickable: false
+            });
+
+            poly.setMap(map);
+
+            map.addListener('click', click);
+            map.addListener('mousemove', mouseMove);
+            map.addListener('mouseout', mouseout);
+        }
+
+        function mouseMove(event) {
+            var path = poly.getPath();
+
+            if (path.length) {
+                var newLatLng = getNewLatLng(event);
+
+                if (newLatLng) {
+                    tmpPoly.setPath([path.getAt(path.length - 1), newLatLng]);
+                }
             }
         }
 
-        class Line {
-            constructor(pos) {
-                this.el = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                this.el.classList.add("line");
-                this.el.setAttribute("stroke", "red");
-                this.el.setAttribute("stroke-width", "20");
-                this.setPosition(pos);
+        function click(event) {
+            var can = true;
+            var newLatLng;
+
+            var path = poly.getPath();
+
+            if (path.length) {
+                newLatLng = getNewLatLng(event);
+                can = canClick(path.getAt(path.length - 1), newLatLng);
+            } else {
+                newLatLng = event.latLng;
             }
 
-            setPosition(pos) {
-                this.el.setAttribute("x1", pos.x1);
-                this.el.setAttribute("y1", pos.y1);
-                this.el.setAttribute("x2", pos.x2);
-                this.el.setAttribute("y2", pos.y2);
-            }
+            if (can) {
+                path.push(newLatLng);
 
-            getPosition() {
-                return {
-                    x1: this.el.getAttribute("x1"),
-                    y1: this.el.getAttribute("y1"),
-                    x2: this.el.getAttribute("x2"),
-                    y2: this.el.getAttribute("y1")
-                };
-            }
-
-            getHtmlEl() {
-                return this.el;
+                var marker = new google.maps.Marker({
+                    position: newLatLng,
+                    map: map
+                });
             }
         }
 
-        class Graph {
-            constructor(el) {
-                this.el = el;
-                this.elements = [];
+        function mouseout() {
+            var newLatLng;
 
-                this.setSize();
+            var path = poly.getPath();
 
-                this.el.onmousedown = this.mouseDown.bind(this);
-                this.el.onmousemove = this.mouseMove.bind(this);
-            }
+            var firstLat = path.getAt(0).lat();
+            var firstLng = path.getAt(0).lng();
 
-            mouseDown(event) {
-                this.drawStart = true;
+            var lastLat = path.getAt(path.length - 1).lat();
+            var lastLng = path.getAt(path.length - 1).lng();
 
-                let line = new Line({
-                    x1: event.pageX,
-                    y1: event.pageY,
-                    x2: event.pageX,
-                    y2: event.pageY
-                });
+            var firstLatAbs = Math.abs(firstLat);
+            var firstLngAbs = Math.abs(firstLng);
+            var lastLatAbs = Math.abs(lastLat);
+            var lastLngAbs = Math.abs(lastLng);
 
-                let circle = new Circle({
-                    cx: event.pageX,
-                    cy: event.pageY,
-                });
-
-                this.current = line;
-                this.el.appendChild(line.getHtmlEl());
-                this.el.appendChild(circle.getHtmlEl());
-            }
-
-            mouseUp(event) {
-                this.drawStart = false;
-                this.current = null;
-            }
-
-            mouseMove(event) {
-                if (this.drawStart && this.current) {
-                    let pos = this.current.getPosition();
-                    pos.x2 = event.pageX;
-                    pos.y2 = event.pageY;
-                    this.current.setPosition(pos);
+            if (firstLatAbs > lastLatAbs && firstLngAbs > lastLngAbs) {
+                if(direction[0] !== 'north') {
+                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                } else {
+                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                }
+            } else if (firstLatAbs > lastLatAbs && firstLngAbs < lastLngAbs) {
+                if(direction[0] !== 'south') {
+                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                } else {
+                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                }
+            } else if (firstLatAbs < lastLatAbs && firstLngAbs > lastLngAbs) {
+                if(direction[0] !== 'south') {
+                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                } else {
+                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                }
+            } else if (firstLatAbs < lastLatAbs && firstLngAbs < lastLngAbs) {
+                if(direction[0] !== 'north') {
+                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                } else {
+                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
                 }
             }
 
-            setSize() {
-                this.el.setAttribute("width", window.innerWidth);
-                this.el.setAttribute("height", window.innerHeight);
-            }
+            var marker = new google.maps.Marker({
+                position: newLatLng,
+                map: map
+            });
+
+            path.push(newLatLng);
+            path.push(path.getAt(0));
         }
 
-        window.onload = () => {
-            window.graph = new Graph(document.getElementById("graph"));
-        };
+        function getNewLatLng(event) {
+            var newLatLng;
+
+            var path = poly.getPath();
+            var currentLat = event.latLng.lat();
+            var currentLng = event.latLng.lng();
+
+            var prevLat = path.getAt(path.length - 1).lat();
+            var prevLng = path.getAt(path.length - 1).lng();
+
+            var prevLatAbs = Math.abs(prevLat);
+            var prevLngAbs = Math.abs(prevLng);
+            var currentLatAbs = Math.abs(currentLat);
+            var currentLngAbs = Math.abs(currentLng);
+            var latAbsDiff = Math.abs(prevLatAbs - currentLatAbs);
+            var lngAbsDiff = Math.abs(prevLngAbs - currentLngAbs);
+
+            if (latAbsDiff > lngAbsDiff) {
+                newLatLng = new google.maps.LatLng(currentLat, prevLng);
+            } else {
+                newLatLng = new google.maps.LatLng(prevLat, currentLng);
+            }
+
+            return newLatLng;
+        }
+
+        function canClick(prevLatLng, currentLatLng) {
+            var dir;
+            var can;
+            var tmpDirection = direction[direction.length -1];
+
+            if(currentLatLng.lng() > prevLatLng.lng()) {
+                dir = 'east';
+                can = tmpDirection !== 'west';
+            } else if (currentLatLng.lng() < prevLatLng.lng()) {
+                dir = 'west';
+                can = tmpDirection !== 'east';
+            } else if(currentLatLng.lat() > prevLatLng.lat()) {
+                dir = 'north';
+                can = tmpDirection !== 'south';
+            } else if (currentLatLng.lat() < prevLatLng.lat()){
+                dir = 'south';
+                can = tmpDirection !== 'north';
+            }
+
+            if (can) {
+                direction.push(dir);
+            }
+
+            return can;
+        }
     </script>
 </body>
 
