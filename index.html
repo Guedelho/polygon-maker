@@ -33,11 +33,11 @@
         var clickEvent;
         var mouseOutEvent;
         var mouseMoveEvent;
-        var direction = [];
+        var directions = [];
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 7,
+                zoom: 3,
                 center: {
                     lat: -15.77972,
                     lng: -47.92972
@@ -79,19 +79,19 @@
         }
 
         function click(event) {
-            var can = true;
+            var canGo = true;
             var newLatLng;
 
             var path = poly.getPath();
 
             if (path.length) {
                 newLatLng = getNewLatLng(event);
-                can = canClick(path.getAt(path.length - 1), newLatLng);
+                canGo = canClick(path.getAt(path.length - 1), newLatLng);
             } else {
                 newLatLng = event.latLng;
             }
 
-            if (can) {
+            if (canGo) {
                 addMarker(newLatLng);
                 pointControl(newLatLng);
             }
@@ -99,6 +99,7 @@
 
         function mouseOut() {
             var newLatLng;
+            var firstDirection = directions[0];
 
             var path = poly.getPath();
 
@@ -114,32 +115,64 @@
             var lastLngAbs = Math.abs(lastLng);
 
             if (firstLatAbs > lastLatAbs && firstLngAbs > lastLngAbs) {
-                console.log(1, direction);
-                if(direction[0] === 'south' || direction[0] === 'east') {
-                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                console.log(1)
+                if (firstLat > 0 || lastLat > 0) {
+                    if(firstDirection === 'north' || firstDirection === 'east') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 } else {
-                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    if(firstDirection === 'south' || firstDirection === 'east') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 }
             } else if (firstLatAbs > lastLatAbs && firstLngAbs < lastLngAbs) {
-                console.log(2, direction);
-                if(direction[0] === 'south' || direction[0] === 'west') {
-                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                console.log(2)
+                if (firstLat > 0 || lastLat > 0) {
+                    if(firstDirection === 'north' || firstDirection === 'west') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 } else {
-                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    if (firstDirection === 'south' || firstDirection === 'west') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 }
             } else if (firstLatAbs < lastLatAbs && firstLngAbs > lastLngAbs) {
-                console.log(3, direction);
-                if(direction[0] === 'north' || direction[0] === 'east') {
-                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                console.log(3)
+                if (firstLat > 0 || lastLat > 0) {
+                    if(firstDirection === 'south' || firstDirection === 'east') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 } else {
-                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    if(firstDirection === 'north' || firstDirection === 'east') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 }
             } else if (firstLatAbs < lastLatAbs && firstLngAbs < lastLngAbs) {
-                console.log(4, direction);
-                if(direction[0] === 'north' || direction[0] === 'west') {
-                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                console.log(4)
+                if (firstLat > 0 || lastLat > 0) {
+                    if(firstDirection === 'south' || firstDirection === 'west') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 } else {
-                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    if(firstDirection === 'north' || firstDirection === 'west') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 }
             }
 
@@ -151,7 +184,7 @@
 
             // debug points
             path.forEach((latLnb, i) => {
-                console.log(latLnb.lat(), latLnb.lng(), i);
+                console.log(latLnb.toString(), i);
             });
 
             google.maps.event.removeListener(clickEvent);
@@ -163,6 +196,7 @@
             var newLatLng;
 
             var path = poly.getPath();
+
             var currentLat = event.latLng.lat();
             var currentLng = event.latLng.lng();
 
@@ -187,58 +221,57 @@
 
         function canClick(prevLatLng, currentLatLng) {
             var dir;
-            var can;
-            var tmpDirection = direction[direction.length -1];
+            var canGo;
+            var lastDirection = directions[directions.length -1];
 
             if(currentLatLng.lng() > prevLatLng.lng()) {
                 dir = 'east';
-                can = tmpDirection !== 'west';
+                canGo = lastDirection !== 'west';
             } else if (currentLatLng.lng() < prevLatLng.lng()) {
                 dir = 'west';
-                can = tmpDirection !== 'east';
+                canGo = lastDirection !== 'east';
             } else if(currentLatLng.lat() > prevLatLng.lat()) {
                 dir = 'north';
-                can = tmpDirection !== 'south';
+                canGo = lastDirection !== 'south';
             } else if (currentLatLng.lat() < prevLatLng.lat()){
                 dir = 'south';
-                can = tmpDirection !== 'north';
+                canGo = lastDirection !== 'north';
             }
 
-            if (can) {
-                direction.push(dir);
+            if (canGo) {
+                directions.push(dir);
+                console.log(directions)
             }
 
-            return can;
+            return canGo;
         }
 
         function pointControl(newLatLng, lastPoint = false) {
             var path = poly.getPath();
-            var pathLength = path.length;
 
-            if (pathLength > 1) {
-                var prev1 = path.getAt(pathLength - 1);
-                var prev2 = path.getAt(pathLength - 2);
+            if (path.length > 1) {
+                var prev1 = path.getAt(path.length - 1);
+                var prev2 = path.getAt(path.length - 2);
 
                 if (lastPoint) {
-                    prev2 = path.getAt(0);
-                    pathLength = 1;
+                    if (verifyPoints(prev1, path.getAt(1), newLatLng)) {
+                        path.removeAt(0);
+                    }
+                    path.push(path.getAt(0));
+                    return;
                 }
 
-                if (prev1.lat() === prev2.lat() && prev2.lat() === newLatLng.lat()) {
-                    path.removeAt(pathLength - 1);
-                }
-
-                if (prev1.lng() === prev2.lng() && prev2.lng() === newLatLng.lng()) {
-                    path.removeAt(pathLength - 1);
+                if (verifyPoints(prev1, prev2, newLatLng)) {
+                    path.removeAt(path.length - 1);
                 }
             }
 
+            path.push(newLatLng);
+        }
 
-            if (lastPoint) {
-                path.push(path.getAt(0));
-            } else {
-                path.push(newLatLng);
-            }
+        function verifyPoints(point1, point2, point3) {
+            return (point1.lat() === point2.lat() && point2.lat() === point3.lat())
+                || (point1.lng() === point2.lng() && point2.lng() === point3.lng());
         }
 
         function addMarker(newLatLng) {
@@ -248,9 +281,8 @@
             });
 
             var infowindow = new google.maps.InfoWindow({
-                content: `# ${newLatLng.lat()} | ${newLatLng.lng()}`,
+                content: newLatLng.toString(),
             });
-
 
             marker.addListener('click', function() {
                 infowindow.open(map, marker);
