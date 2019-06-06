@@ -97,17 +97,18 @@
             }
         }
 
-        function mouseOut() {
+        function mouseOut(event, test = null) {
             var newLatLng;
             var firstDirection = directions[0];
+            var lastDirection = directions[directions.length - 1];
 
             var path = poly.getPath();
 
-            var firstLat = path.getAt(0).lat();
-            var firstLng = path.getAt(0).lng();
+            var firstLat = test ? test[0].lat: path.getAt(0).lat();
+            var firstLng = test ? test[0].lng: path.getAt(0).lng();
 
-            var lastLat = path.getAt(path.length - 1).lat();
-            var lastLng = path.getAt(path.length - 1).lng();
+            var lastLat = test ? test[test.length - 1].lat: path.getAt(path.length - 1).lat();
+            var lastLng = test ? test[test.length - 1].lng: path.getAt(path.length - 1).lng();
 
             var firstLatAbs = Math.abs(firstLat);
             var firstLngAbs = Math.abs(firstLng);
@@ -115,66 +116,44 @@
             var lastLngAbs = Math.abs(lastLng);
 
             if (firstLatAbs > lastLatAbs && firstLngAbs > lastLngAbs) {
-                console.log(1)
-                if (firstLat > 0 || lastLat > 0) {
-                    if(firstDirection === 'north' || firstDirection === 'east') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
-                    } else {
-                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
-                    }
+                console.log('If path taken: ', 1);
+                if (firstDirection !== 'north') {
+                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
                 } else {
-                    if(firstDirection === 'south' || firstDirection === 'east') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
-                    } else {
-                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
-                    }
+                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
                 }
             } else if (firstLatAbs > lastLatAbs && firstLngAbs < lastLngAbs) {
-                console.log(2)
-                if (firstLat > 0 || lastLat > 0) {
-                    if(firstDirection === 'north' || firstDirection === 'west') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
-                    } else {
-                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
-                    }
+                console.log('If path taken: ', 2);
+                if (firstDirection !== 'north') {
+                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
                 } else {
-                    if (firstDirection === 'south' || firstDirection === 'west') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
-                    } else {
-                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
-                    }
+                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
                 }
             } else if (firstLatAbs < lastLatAbs && firstLngAbs > lastLngAbs) {
-                console.log(3)
-                if (firstLat > 0 || lastLat > 0) {
-                    if(firstDirection === 'south' || firstDirection === 'east') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
-                    } else {
-                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
-                    }
+                console.log('If path taken: ', 3);
+                if (firstDirection !== 'south') {
+                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
                 } else {
-                    if(firstDirection === 'north' || firstDirection === 'east') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
-                    } else {
-                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
-                    }
+                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
                 }
             } else if (firstLatAbs < lastLatAbs && firstLngAbs < lastLngAbs) {
-                console.log(4)
-                if (firstLat > 0 || lastLat > 0) {
-                    if(firstDirection === 'south' || firstDirection === 'west') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
-                    } else {
-                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
-                    }
+                console.log('If path taken: ', 4);
+                if (firstDirection !== 'south') {
+                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
                 } else {
-                    if(firstDirection === 'north' || firstDirection === 'west') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
-                    } else {
-                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
-                    }
+                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
                 }
             }
+
+            if (test) return newLatLng;
+
+            // debug points
+            path.forEach((latLnb, i) => {
+                console.log({
+                    lat: latLnb.lat(),
+                    lng: latLnb.lng(),
+                });
+            });
 
             addMarker(newLatLng);
             pointControl(newLatLng);
@@ -288,6 +267,108 @@
                 infowindow.open(map, marker);
             });
         }
+
+
+        function testing() {
+            var mouseOutTest = mouseOut;
+            var mockPath;
+            var mockPoint;
+
+            // ===========================================================
+            mockPath = [
+                {lat: -5.077970619080265, lng: -54.785188749999975},
+                {lat: -21.60447005869258, lng: -54.785188749999975},
+                {lat: -21.60447005869258, lng: -38.261751249999975}
+            ];
+
+            mockPoint = '(-21.60447005869258, -54.785188749999975)';
+            caseTestMount('Test 1', mockPath, mockPoint);
+
+            // ===========================================================
+            mockPath = [
+                {lat: -8.915619852948824, lng: -45.117219999999975},
+                {lat: -28.138018368587364, lng: -45.117219999999975},
+                {lat: -28.138018368587364, lng: -61.113313749999975}
+            ];
+
+            mockPoint = '(-28.138018368587364, -45.117219999999975)';
+            caseTestMount('Test 2', mockPath, mockPoint);
+
+            // ===========================================================
+            mockPath = [
+                {lat: -18.133474292181493, lng: -46.347688749999975},
+                {lat: -18.133474292181493, lng: -30.703157499999975},
+                {lat: -4.902855778034949, lng: -30.703157499999975}
+            ];
+
+            mockPoint = '(-4.902855778034949, -46.347688749999975)';
+            caseTestMount('Test 3', mockPath, mockPoint);
+
+            // ===========================================================
+            mockPath = [
+                {lat: -5.077970619080265, lng: -51.796907499999975},
+                {lat: -5.077970619080265, lng: -26.484407499999975},
+                {lat: -23.873927866776896, lng: -26.484407499999975}
+            ];
+
+            mockPoint = '(-23.873927866776896, -51.796907499999975)';
+            caseTestMount('Test 4', mockPath, mockPoint);
+
+            // ===========================================================
+            mockPath = [
+                {lat: -12.884792658169308, lng: -45.820344999999975},
+                {lat: -2.973920204530808, lng: -45.820344999999975},
+                {lat: -2.973920204530808, lng: -57.246126249999975},
+                {lat: -33.420570859018824, lng: -57.246126249999975}
+            ];
+
+            mockPoint = '(-33.420570859018824, -45.820344999999975)';
+
+            caseTestMount('Test 5', mockPath, mockPoint);
+
+            // ===========================================================
+            mockPath = [
+                {lat: -7.175178246513995, lng: -43.886751249999975},
+                {lat: -7.175178246513995, lng: -55.136751249999975},
+                {lat: -19.298850905609324, lng: -55.136751249999975}
+            ];
+
+            mockPoint = '(-19.298850905609324, -43.886751249999975)';
+
+            caseTestMount('Test 6', mockPath, mockPoint);
+
+            // ===========================================================
+            mockPath = [
+                {lat: -6.477041827552603, lng: -48.281282499999975},
+                {lat: -6.477041827552603, lng: -31.933626249999975},
+                {lat: -29.6767370099504, lng: -31.933626249999975},
+                {lat: -29.6767370099504, lng: -41.074251249999975}
+            ];
+
+            mockPoint = '(-29.6767370099504, -48.281282499999975)';
+
+            caseTestMount('Test 7', mockPath, mockPoint);
+        }
+
+        function caseTestMount(title, mockPath, mockPoint) {
+            var mouseOutTest = mouseOut;
+
+            console.group(title);
+
+            var returnTest = mouseOutTest(null, mockPath).toString();
+            var testResult = mockPoint === returnTest;
+
+            console.log('MockPath: ', mockPath);
+            console.log('MockPoint: ', mockPoint);
+            console.log('Return: ', returnTest);
+            if (testResult) {
+                console.info('Result: ', testResult);
+            } else {
+                console.error('Result: ', testResult);
+            }
+            console.groupEnd();
+        }
+
     </script>
 </body>
 
