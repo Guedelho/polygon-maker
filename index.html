@@ -117,31 +117,63 @@
 
             if (firstLatAbs > lastLatAbs && firstLngAbs > lastLngAbs) {
                 console.log('If path taken: ', 1);
-                if (firstDirection !== 'north') {
-                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                if (firstLat > 0 && lastLat > 0) {
+                    if (firstDirection !== 'south') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 } else {
-                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    if (firstDirection !== 'north') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 }
             } else if (firstLatAbs > lastLatAbs && firstLngAbs < lastLngAbs) {
                 console.log('If path taken: ', 2);
-                if (firstDirection !== 'north') {
-                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                if (firstLat > 0 && lastLat > 0) {
+                    if (firstDirection !== 'south') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 } else {
-                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    if (firstDirection !== 'north') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 }
             } else if (firstLatAbs < lastLatAbs && firstLngAbs > lastLngAbs) {
                 console.log('If path taken: ', 3);
-                if (firstDirection !== 'south') {
-                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                if (firstLat > 0 && lastLat > 0) {
+                    if (firstDirection !== 'north') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 } else {
-                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    if (firstDirection !== 'south') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 }
             } else if (firstLatAbs < lastLatAbs && firstLngAbs < lastLngAbs) {
                 console.log('If path taken: ', 4);
-                if (firstDirection !== 'south') {
-                    newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                if (firstLat > 0 && lastLat > 0) {
+                    if (firstDirection !== 'north') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 } else {
-                    newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    if (firstDirection !== 'south') {
+                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    } else {
+                        newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                    }
                 }
             }
 
