@@ -26,6 +26,11 @@
     type="text/javascript"></script>
     </script>
     <script>
+        const NORTH = 'NORTH';
+        const SOUTH = 'SOUTH';
+        const EAST = 'EAST';
+        const WEST = 'WEST';
+
         var dir;
         var map;
         var poly;
@@ -118,14 +123,22 @@
             if (firstLatAbs > lastLatAbs && firstLngAbs > lastLngAbs) {
                 console.log('If path taken: ', 1);
                 if (firstLat > 0 && lastLat > 0) {
-                    if (firstDirection !== 'south') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    if (firstDirection !== SOUTH) {
+                        if (lastDirection === SOUTH || lastDirection === WEST) {
+                            newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                        } else {
+                            newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                        }
                     } else {
                         newLatLng = new google.maps.LatLng(firstLat, lastLng);
                     }
                 } else {
-                    if (firstDirection !== 'north') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    if (firstDirection !== NORTH) {
+                        if (lastDirection === NORTH || lastDirection === WEST) {
+                            newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                        } else {
+                            newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                        }
                     } else {
                         newLatLng = new google.maps.LatLng(firstLat, lastLng);
                     }
@@ -133,14 +146,22 @@
             } else if (firstLatAbs > lastLatAbs && firstLngAbs < lastLngAbs) {
                 console.log('If path taken: ', 2);
                 if (firstLat > 0 && lastLat > 0) {
-                    if (firstDirection !== 'south') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    if (firstDirection !== SOUTH) {
+                        if (lastDirection === SOUTH || lastDirection === EAST) {
+                            newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                        } else {
+                            newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                        }
                     } else {
                         newLatLng = new google.maps.LatLng(firstLat, lastLng);
                     }
                 } else {
-                    if (firstDirection !== 'north') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    if (firstDirection !== NORTH) {
+                        if (lastDirection === NORTH || lastDirection === EAST) {
+                            newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                        } else {
+                            newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                        }
                     } else {
                         newLatLng = new google.maps.LatLng(firstLat, lastLng);
                     }
@@ -148,14 +169,22 @@
             } else if (firstLatAbs < lastLatAbs && firstLngAbs > lastLngAbs) {
                 console.log('If path taken: ', 3);
                 if (firstLat > 0 && lastLat > 0) {
-                    if (firstDirection !== 'north') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    if (firstDirection !== NORTH) {
+                        if (lastDirection === NORTH || lastDirection === WEST) {
+                            newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                        } else {
+                            newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                        }
                     } else {
                         newLatLng = new google.maps.LatLng(firstLat, lastLng);
                     }
                 } else {
-                    if (firstDirection !== 'south') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    if (firstDirection !== SOUTH) {
+                        if (lastDirection === SOUTH || lastDirection === WEST) {
+                            newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                        } else {
+                            newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                        }
                     } else {
                         newLatLng = new google.maps.LatLng(firstLat, lastLng);
                     }
@@ -163,14 +192,22 @@
             } else if (firstLatAbs < lastLatAbs && firstLngAbs < lastLngAbs) {
                 console.log('If path taken: ', 4);
                 if (firstLat > 0 && lastLat > 0) {
-                    if (firstDirection !== 'north') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    if (firstDirection !== NORTH) {
+                        if (lastDirection === NORTH || lastDirection === EAST) {
+                            newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                        } else {
+                            newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                        }
                     } else {
                         newLatLng = new google.maps.LatLng(firstLat, lastLng);
                     }
                 } else {
-                    if (firstDirection !== 'south') {
-                        newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                    if (firstDirection !== SOUTH) {
+                        if (lastDirection === SOUTH || lastDirection === EAST) {
+                            newLatLng = new google.maps.LatLng(lastLat, firstLng);
+                        } else {
+                            newLatLng = new google.maps.LatLng(firstLat, lastLng);
+                        }
                     } else {
                         newLatLng = new google.maps.LatLng(firstLat, lastLng);
                     }
@@ -231,30 +268,29 @@
         }
 
         function canClick(prevLatLng, currentLatLng) {
-            var dir;
-            var canGo;
             var lastDirection = directions[directions.length -1];
 
-            if(currentLatLng.lng() > prevLatLng.lng()) {
-                dir = 'east';
-                canGo = lastDirection !== 'west';
-            } else if (currentLatLng.lng() < prevLatLng.lng()) {
-                dir = 'west';
-                canGo = lastDirection !== 'east';
-            } else if(currentLatLng.lat() > prevLatLng.lat()) {
-                dir = 'north';
-                canGo = lastDirection !== 'south';
-            } else if (currentLatLng.lat() < prevLatLng.lat()){
-                dir = 'south';
-                canGo = lastDirection !== 'north';
+            if (currentLatLng.lng() > prevLatLng.lng() && lastDirection !== WEST) {
+                directions.push(EAST);
+                return true;
             }
 
-            if (canGo) {
-                directions.push(dir);
-                console.log(directions)
+            if (currentLatLng.lng() < prevLatLng.lng() && lastDirection !== EAST) {
+                directions.push(WEST);
+                return true;
             }
 
-            return canGo;
+            if (currentLatLng.lat() > prevLatLng.lat() && lastDirection !== SOUTH) {
+                directions.push(NORTH);
+                return true;
+            }
+            
+            if (currentLatLng.lat() < prevLatLng.lat() && lastDirection !== NORTH){
+                directions.push(SOUTH);
+                return true;
+            }
+
+            return false;
         }
 
         function pointControl(newLatLng, lastPoint = false) {
@@ -313,7 +349,7 @@
                 {lat: -21.60447005869258, lng: -38.261751249999975}
             ];
 
-            mockPoint = '(-21.60447005869258, -54.785188749999975)';
+            mockPoint = '(-5.077970619080265, -38.261751249999975)';
             caseTestMount('Test 1', mockPath, mockPoint);
 
             // ===========================================================
@@ -323,7 +359,7 @@
                 {lat: -28.138018368587364, lng: -61.113313749999975}
             ];
 
-            mockPoint = '(-28.138018368587364, -45.117219999999975)';
+            mockPoint = '(-8.915619852948824, -61.113313749999975)';
             caseTestMount('Test 2', mockPath, mockPoint);
 
             // ===========================================================
@@ -333,7 +369,7 @@
                 {lat: -4.902855778034949, lng: -30.703157499999975}
             ];
 
-            mockPoint = '(-4.902855778034949, -46.347688749999975)';
+            mockPoint = '(-18.133474292181493, -30.703157499999975)';
             caseTestMount('Test 3', mockPath, mockPoint);
 
             // ===========================================================
@@ -343,7 +379,7 @@
                 {lat: -23.873927866776896, lng: -26.484407499999975}
             ];
 
-            mockPoint = '(-23.873927866776896, -51.796907499999975)';
+            mockPoint = '(-5.077970619080265, -26.484407499999975)';
             caseTestMount('Test 4', mockPath, mockPoint);
 
             // ===========================================================
@@ -354,7 +390,7 @@
                 {lat: -33.420570859018824, lng: -57.246126249999975}
             ];
 
-            mockPoint = '(-33.420570859018824, -45.820344999999975)';
+            mockPoint = '(-12.884792658169308, -57.246126249999975)';
 
             caseTestMount('Test 5', mockPath, mockPoint);
 
@@ -365,7 +401,7 @@
                 {lat: -19.298850905609324, lng: -55.136751249999975}
             ];
 
-            mockPoint = '(-19.298850905609324, -43.886751249999975)';
+            mockPoint = '(-7.175178246513995, -55.136751249999975)';
 
             caseTestMount('Test 6', mockPath, mockPoint);
 
@@ -377,9 +413,21 @@
                 {lat: -29.6767370099504, lng: -41.074251249999975}
             ];
 
-            mockPoint = '(-29.6767370099504, -48.281282499999975)';
+            mockPoint = '(-6.477041827552603, -41.074251249999975)';
 
             caseTestMount('Test 7', mockPath, mockPoint);
+
+            // ===========================================================
+            mockPath = [
+                {lat: -7.959298582864124, lng: -51.972688749999975},
+                {lat: -7.959298582864124, lng: -34.043001249999975},
+                {lat: -20.867172971922006, lng: -34.043001249999975},
+                {lat: -20.867172971922006, lng: -67.96878249999997}
+            ];
+
+            mockPoint = '(-7.959298582864124, -67.96878249999997)';
+
+            caseTestMount('Test 8', mockPath, mockPoint);
         }
 
         function caseTestMount(title, mockPath, mockPoint) {
