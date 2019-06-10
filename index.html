@@ -122,7 +122,7 @@
 
             if (firstLatAbs > lastLatAbs && firstLngAbs > lastLngAbs) {
                 console.log('If path taken: ', 1);
-                if (firstLat > 0 && lastLat > 0) {
+                if (firstLat > 0 || lastLat > 0) {
                     if (firstDirection !== SOUTH) {
                         if (lastDirection === SOUTH || lastDirection === WEST) {
                             newLatLng = new google.maps.LatLng(lastLat, firstLng);
@@ -145,7 +145,7 @@
                 }
             } else if (firstLatAbs > lastLatAbs && firstLngAbs < lastLngAbs) {
                 console.log('If path taken: ', 2);
-                if (firstLat > 0 && lastLat > 0) {
+                if (firstLat > 0 || lastLat > 0) {
                     if (firstDirection !== SOUTH) {
                         if (lastDirection === SOUTH || lastDirection === EAST) {
                             newLatLng = new google.maps.LatLng(lastLat, firstLng);
@@ -168,7 +168,7 @@
                 }
             } else if (firstLatAbs < lastLatAbs && firstLngAbs > lastLngAbs) {
                 console.log('If path taken: ', 3);
-                if (firstLat > 0 && lastLat > 0) {
+                if (firstLat > 0 || lastLat > 0) {
                     if (firstDirection !== NORTH) {
                         if (lastDirection === NORTH || lastDirection === WEST) {
                             newLatLng = new google.maps.LatLng(lastLat, firstLng);
@@ -191,7 +191,7 @@
                 }
             } else if (firstLatAbs < lastLatAbs && firstLngAbs < lastLngAbs) {
                 console.log('If path taken: ', 4);
-                if (firstLat > 0 && lastLat > 0) {
+                if (firstLat > 0 || lastLat > 0) {
                     if (firstDirection !== NORTH) {
                         if (lastDirection === NORTH || lastDirection === EAST) {
                             newLatLng = new google.maps.LatLng(lastLat, firstLng);
